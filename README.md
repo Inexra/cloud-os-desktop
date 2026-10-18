@@ -42,11 +42,18 @@ A live image is designed to run without modifying the internal drive, but bootin
 - Low-overhead compositor settings, dock icon-zoom animation and zram swap tuning
 - Target idle desktop RAM below 1 GB, subject to real-hardware testing
 - Dark, uncluttered desktop with a dock
-- File manager, browser, terminal, settings and network controls
+- Google Chrome as the default browser, plus VLC media player for video and audio
+- File manager, terminal, settings and network controls
 - Java 21 development tools and BlueJ IDE for Java coursework
 - WordCraft word processor and DeckCraft presentation editor (included in the image)
 - Cloud ISO builds using GitHub Actions
 - No local Android Studio, Docker or Linux build environment required
+
+## Browser and media player
+
+The image downloads the official 64-bit Google Chrome Stable Debian package from Google's download server and sets Chrome as the default browser for newly created live-session users. Firefox is not installed by default. Chrome is proprietary software and its package increases the download and ISO size; its upstream package may add Google's update repository during installation. VLC is installed from Debian's repositories for local video and audio playback. Chrome can use substantial RAM on a 4 GB laptop, especially with many tabs, so keep tabs limited when prioritizing responsiveness.
+
+Official Chrome download: https://www.google.com/chrome/
 
 ## Java and BlueJ
 
