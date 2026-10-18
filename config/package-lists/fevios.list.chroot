@@ -1,16 +1,15 @@
-# FeviOS base desktop and essential utilities
+# FeviOS lightweight desktop and essential utilities
 xfce4
-xfce4-goodies
 lightdm
 lightdm-gtk-greeter
 plank
+dconf-cli
 thunar
 thunar-archive-plugin
 file-roller
 network-manager
 network-manager-gnome
 wpasupplicant
-wireless-tools
 alsa-utils
 pavucontrol
 pipewire
@@ -35,6 +34,7 @@ papirus-icon-theme
 adwaita-icon-theme
 xfce4-power-manager
 xfce4-notifyd
+zram-tools
 
 # Java development and BlueJ prerequisites
 openjdk-21-jdk
