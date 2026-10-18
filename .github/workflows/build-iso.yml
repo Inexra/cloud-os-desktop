@@ -30,6 +30,15 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y live-build debootstrap squashfs-tools xorriso
 
+      - name: Download official BlueJ Debian package
+        run: |
+          mkdir -p config/packages.chroot
+          curl --fail --location --retry 3 \\
+            "https://github.com/k-pet-group/BlueJ-Greenfoot/releases/download/BLUEJ-RELEASE-6.0.1/BlueJ-linux-x64-6.0.1.deb" \\
+            --output config/packages.chroot/bluej.deb
+          test -s config/packages.chroot/bluej.deb
+          ls -lh config/packages.chroot/bluej.deb
+
       - name: Configure Debian Live image
         run: |
           lb config \
