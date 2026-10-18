@@ -25,25 +25,8 @@ jobs:
       - name: Check out FeviOS
         uses: actions/checkout@v4
 
-      - name: Install image-building tools
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y live-build debootstrap squashfs-tools xorriso
-
-      - name: Fix live-build Debian Contents index path
-        run: |
-          # Debian publishes Contents indexes inside each component directory.
-          # The Ubuntu-packaged live-build script incorrectly requests them at dists/<suite>/.
-          sudo grep -RIl 'dists/${LB_DISTRIBUTION}/Contents-${LB_ARCHITECTURES}.gz' /usr/lib/live/build | while read -r file; do
-            sudo sed -i 's#dists/${LB_DISTRIBUTION}/Contents-${LB_ARCHITECTURES}.gz#dists/${LB_DISTRIBUTION}/main/Contents-${LB_ARCHITECTURES}.gz#g' "$file"
-          done
-          sudo grep -RIl 'dists/${LB_PARENT_DISTRIBUTION}/Contents-${LB_ARCHITECTURES}.gz' /usr/lib/live/build | while read -r file; do
-            sudo sed -i 's#dists/${LB_PARENT_DISTRIBUTION}/Contents-${LB_ARCHITECTURES}.gz#dists/${LB_PARENT_DISTRIBUTION}/main/Contents-${LB_ARCHITECTURES}.gz#g' "$file"
-          done
-          if sudo grep -R 'dists/${LB_DISTRIBUTION}/Contents-${LB_ARCHITECTURES}.gz' /usr/lib/live/build; then
-            echo 'The live-build Contents URL patch did not apply.'
-            exit 1
-          fi
+      - name: Verify Docker is available
+        run: docker info
 
       - name: Download official Google Chrome stable package
         run: |
@@ -76,8 +59,25 @@ jobs:
           test -s config/packages.chroot/deckcraft_amd64.deb
           ls -lh config/packages.chroot/wordcraft_amd64.deb config/packages.chroot/deckcraft_amd64.deb
 
-      - name: Configure Debian Live image
+      - name: Build FeviOS with Debian Trixie live-build
+        shell: bash
         run: |
+          set -euo pipefail
+          cat > .github/build-fevios-inside-container.sh <<'BUILD_SCRIPT'
+          #!/usr/bin/env bash
+          set -Eeuo pipefail
+          export DEBIAN_FRONTEND=noninteractive
+
+          apt-get update
+          apt-get install -y --no-install-recommends \
+            live-build debootstrap squashfs-tools xorriso \
+            gnupg ca-certificates curl debian-archive-keyring
+
+          echo "live-build version:"
+          lb --version
+          echo "debootstrap version:"
+          debootstrap --version
+
           lb config \
             --distribution trixie \
             --linux-packages linux-image-amd64 \
@@ -92,20 +92,23 @@ jobs:
             --debian-installer live \
             --bootappend-live "boot=live components username=fevi hostname=fevios locales=en_US.UTF-8 keyboard-layouts=us" \
             --apt-recommends true \
+            --apt-secure true \
             --firmware-chroot true \
             --firmware-binary true
 
-      - name: Prepare custom hook
-        run: chmod +x config/hooks/normal/0200-fevios-branding.hook.chroot
+          chmod +x config/hooks/normal/0200-fevios-branding.hook.chroot
+          lb build 2>&1 | tee build.log
+          BUILD_SCRIPT
 
-      - name: Build FeviOS
-        run: |
-          set -o pipefail
-          sudo lb build 2>&1 | tee build.log
-        shell: bash
+          docker run --privileged --rm \
+            --volume "$GITHUB_WORKSPACE:/workspace" \
+            --workdir /workspace \
+            debian:trixie \
+            bash .github/build-fevios-inside-container.sh
 
       - name: Locate and validate ISO
         id: iso
+        if: success()
         run: |
           ISO="$(find . -maxdepth 1 -type f -name '*.iso' -printf '%f\n' | head -n 1)"
           if [ -z "$ISO" ]; then
@@ -119,6 +122,7 @@ jobs:
           ls -lh "$ISO"
 
       - name: Upload FeviOS ISO artifact
+        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: FeviOS-ISO
