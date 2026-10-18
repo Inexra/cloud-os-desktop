@@ -39,6 +39,19 @@ jobs:
           test -s config/packages.chroot/bluej.deb
           ls -lh config/packages.chroot/bluej.deb
 
+      - name: Download WordCraft and DeckCraft Linux packages
+        run: |
+          mkdir -p config/packages.chroot
+          curl --fail --location --retry 3 \
+            "https://github.com/storytold/wordcraft/releases/download/v0.8.0/wordcraft-0.8.0-linux-x86_64.deb" \
+            --output config/packages.chroot/wordcraft.deb
+          curl --fail --location --retry 3 \
+            "https://github.com/storytold/deckcraft/releases/download/v0.8.0/deckcraft-0.8.0-linux-x86_64.deb" \
+            --output config/packages.chroot/deckcraft.deb
+          test -s config/packages.chroot/wordcraft.deb
+          test -s config/packages.chroot/deckcraft.deb
+          ls -lh config/packages.chroot/wordcraft.deb config/packages.chroot/deckcraft.deb
+
       - name: Configure Debian Live image
         run: |
           lb config \
