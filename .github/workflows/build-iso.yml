@@ -81,6 +81,7 @@ jobs:
           lb config \
             --distribution trixie \
             --linux-packages linux-image-amd64 \
+            --debootstrap-options "--include=gnupg" \
             --mirror-bootstrap "http://deb.debian.org/debian" \
             --mirror-chroot "http://deb.debian.org/debian" \
             --mirror-chroot-security "http://security.debian.org/debian-security" \
@@ -93,14 +94,6 @@ jobs:
             --apt-recommends true \
             --firmware-chroot true \
             --firmware-binary true
-
-      - name: Configure bootstrap packages
-        run: |
-          # live-build reads stage-specific settings from config/bootstrap.
-          # GnuPG must be part of the base filesystem before the chroot APT stage.
-          printf '%s\n' 'LB_BOOTSTRAP_INCLUDE="gnupg"' > config/bootstrap
-          cat config/bootstrap
-          grep -Fxq 'LB_BOOTSTRAP_INCLUDE="gnupg"' config/bootstrap
 
       - name: Prepare custom hook
         run: chmod +x config/hooks/normal/0200-fevios-branding.hook.chroot
