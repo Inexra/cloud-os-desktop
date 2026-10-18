@@ -35,3 +35,7 @@ papirus-icon-theme
 adwaita-icon-theme
 xfce4-power-manager
 xfce4-notifyd
+
+# Java development and BlueJ prerequisites
+openjdk-21-jdk
+openjfx
