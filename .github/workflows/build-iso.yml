@@ -80,7 +80,7 @@ jobs:
 
           lb config \
             --distribution trixie \
-            --linux-packages linux-image-amd64 \
+            --linux-packages linux-image \
             --debootstrap-options "--include=gnupg" \
             --mirror-bootstrap "http://deb.debian.org/debian" \
             --mirror-chroot "http://deb.debian.org/debian" \
