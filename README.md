@@ -14,7 +14,7 @@ FeviOS is a community-built Debian Live image customized with XFCE, a dock, a si
 
 ## Current status
 
-This is an early development build, not a finished or production-certified operating system. GitHub Actions builds a bootable ISO and publishes it as a workflow artifact. The image must be tested on real hardware before considering installation.
+This is an early development build, not a finished or production-certified operating system. The desktop is being tuned for low idle memory use with a target below 1 GB after login, but this is a goal rather than a verified guarantee until measured on the laptop. GitHub Actions builds a bootable ISO and publishes it as a workflow artifact. The image must be tested on real hardware before considering installation.
 
 ## Build FeviOS
 
@@ -38,7 +38,9 @@ A live image is designed to run without modifying the internal drive, but bootin
 
 ## Design goals
 
-- Debian Stable base and XFCE desktop for modest hardware
+- Debian Stable base and a trimmed XFCE desktop for modest hardware
+- Low-overhead compositor settings, dock icon-zoom animation and zram swap tuning
+- Target idle desktop RAM below 1 GB, subject to real-hardware testing
 - Dark, uncluttered desktop with a dock
 - File manager, browser, terminal, settings and network controls
 - Java 21 development tools and BlueJ IDE for Java coursework
@@ -55,6 +57,14 @@ Official BlueJ site: https://bluej.org/
 ## WordCraft and DeckCraft
 
 FeviOS also downloads the x86-64 Debian packages for [WordCraft](https://github.com/storytold/wordcraft/releases/tag/v0.8.0), an open-source word processor for documents, and [DeckCraft](https://github.com/storytold/deckcraft/releases/tag/v0.8.0), an open-source presentation editor. Launch them from the Applications menu or search for their names. They are actively developed software, so check the release notes and keep backups of important work. The two installers add roughly 180 MB before ISO compression, so the final ISO will be larger.
+
+## Performance targets
+
+- Removed the broad `xfce4-goodies` metapackage to avoid installing unnecessary plugins and utilities.
+- Kept XFCE's built-in compositor rather than adding another animation compositor, with window shadows disabled to reduce extra drawing.
+- Configured Plank dock icon zoom for a restrained animated effect.
+- Added zram swap tooling to help the 4 GB laptop cope with memory pressure. Compression uses CPU time, so performance must be checked on the actual machine.
+- The target is less than 1 GB RAM at an idle desktop after login, with no browser, BlueJ, WordCraft or DeckCraft windows open. This cannot be promised from configuration alone: RAM readings vary by hardware, drivers, live-session cache and the measurement method.
 
 ## Roadmap
 
