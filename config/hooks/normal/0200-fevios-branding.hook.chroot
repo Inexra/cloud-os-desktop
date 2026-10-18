@@ -52,6 +52,20 @@ OnlyShowIn=XFCE;
 X-GNOME-Autostart-enabled=true
 EOF
 
+# Prefer Google Chrome for web links and HTML content for new users.
+install -d -m 0755 /etc/skel/.config/xfce4
+cat > /etc/skel/.config/xfce4/helpers.rc <<'EOF'
+WebBrowser=google-chrome.desktop
+EOF
+install -d -m 0755 /etc/skel/.config
+cat > /etc/skel/.config/mimeapps.list <<'EOF'
+[Default Applications]
+text/html=google-chrome.desktop
+application/xhtml+xml=google-chrome.desktop
+x-scheme-handler/http=google-chrome.desktop
+x-scheme-handler/https=google-chrome.desktop
+EOF
+
 # Set a restrained dark theme and readable icon theme for new users.
 install -d -m 0755 /etc/skel/.config/gtk-3.0
 cat > /etc/skel/.config/gtk-3.0/settings.ini <<'EOF'
