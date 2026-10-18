@@ -30,6 +30,21 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y live-build debootstrap squashfs-tools xorriso
 
+      - name: Fix live-build Debian Contents index path
+        run: |
+          # Debian publishes Contents indexes inside each component directory.
+          # The Ubuntu-packaged live-build script incorrectly requests them at dists/<suite>/.
+          sudo grep -RIl 'dists/${LB_DISTRIBUTION}/Contents-${LB_ARCHITECTURES}.gz' /usr/lib/live/build | while read -r file; do
+            sudo sed -i 's#dists/${LB_DISTRIBUTION}/Contents-${LB_ARCHITECTURES}.gz#dists/${LB_DISTRIBUTION}/main/Contents-${LB_ARCHITECTURES}.gz#g' "$file"
+          done
+          sudo grep -RIl 'dists/${LB_PARENT_DISTRIBUTION}/Contents-${LB_ARCHITECTURES}.gz' /usr/lib/live/build | while read -r file; do
+            sudo sed -i 's#dists/${LB_PARENT_DISTRIBUTION}/Contents-${LB_ARCHITECTURES}.gz#dists/${LB_PARENT_DISTRIBUTION}/main/Contents-${LB_ARCHITECTURES}.gz#g' "$file"
+          done
+          if sudo grep -R 'dists/${LB_DISTRIBUTION}/Contents-${LB_ARCHITECTURES}.gz' /usr/lib/live/build; then
+            echo 'The live-build Contents URL patch did not apply.'
+            exit 1
+          fi
+
       - name: Download official Google Chrome stable package
         run: |
           mkdir -p config/packages.chroot
