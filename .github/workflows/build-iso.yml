@@ -50,36 +50,37 @@ jobs:
           mkdir -p config/packages.chroot
           curl --fail --location --retry 3 \
             "https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb" \
-            --output config/packages.chroot/google-chrome.deb
-          test -s config/packages.chroot/google-chrome.deb
-          ls -lh config/packages.chroot/google-chrome.deb
+            --output config/packages.chroot/google-chrome_amd64.deb
+          test -s config/packages.chroot/google-chrome_amd64.deb
+          ls -lh config/packages.chroot/google-chrome_amd64.deb
 
       - name: Download official BlueJ Debian package
         run: |
           mkdir -p config/packages.chroot
           curl --fail --location --retry 3 \
             "https://github.com/k-pet-group/BlueJ-Greenfoot/releases/download/BLUEJ-RELEASE-6.0.1/BlueJ-linux-x64-6.0.1.deb" \
-            --output config/packages.chroot/bluej.deb
-          test -s config/packages.chroot/bluej.deb
-          ls -lh config/packages.chroot/bluej.deb
+            --output config/packages.chroot/bluej_amd64.deb
+          test -s config/packages.chroot/bluej_amd64.deb
+          ls -lh config/packages.chroot/bluej_amd64.deb
 
       - name: Download WordCraft and DeckCraft Linux packages
         run: |
           mkdir -p config/packages.chroot
           curl --fail --location --retry 3 \
             "https://github.com/storytold/wordcraft/releases/download/v0.8.0/wordcraft-0.8.0-linux-x86_64.deb" \
-            --output config/packages.chroot/wordcraft.deb
+            --output config/packages.chroot/wordcraft_amd64.deb
           curl --fail --location --retry 3 \
             "https://github.com/storytold/deckcraft/releases/download/v0.8.0/deckcraft-0.8.0-linux-x86_64.deb" \
-            --output config/packages.chroot/deckcraft.deb
-          test -s config/packages.chroot/wordcraft.deb
-          test -s config/packages.chroot/deckcraft.deb
-          ls -lh config/packages.chroot/wordcraft.deb config/packages.chroot/deckcraft.deb
+            --output config/packages.chroot/deckcraft_amd64.deb
+          test -s config/packages.chroot/wordcraft_amd64.deb
+          test -s config/packages.chroot/deckcraft_amd64.deb
+          ls -lh config/packages.chroot/wordcraft_amd64.deb config/packages.chroot/deckcraft_amd64.deb
 
       - name: Configure Debian Live image
         run: |
           lb config \
             --distribution trixie \
+            --linux-packages linux-image-amd64 \
             --mirror-bootstrap "http://deb.debian.org/debian" \
             --mirror-chroot "http://deb.debian.org/debian" \
             --mirror-chroot-security "http://security.debian.org/debian-security" \
