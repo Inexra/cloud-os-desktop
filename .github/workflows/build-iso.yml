@@ -1,0 +1,83 @@
+name: Build FeviOS ISO
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'config/**'
+      - '.github/workflows/build-iso.yml'
+      - 'README.md'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: fevios-iso-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build bootable Debian Live ISO
+    runs-on: ubuntu-24.04
+    timeout-minutes: 180
+    steps:
+      - name: Check out FeviOS
+        uses: actions/checkout@v4
+
+      - name: Install image-building tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y live-build debootstrap squashfs-tools xorriso
+
+      - name: Configure Debian Live image
+        run: |
+          lb config \
+            --distribution trixie \
+            --archive-areas "main contrib non-free non-free-firmware" \
+            --binary-images iso-hybrid \
+            --debian-installer live \
+            --bootappend-live "boot=live components username=fevi hostname=fevios locales=en_US.UTF-8 keyboard-layouts=us" \
+            --apt-recommends true \
+            --firmware-chroot true \
+            --firmware-binary true
+
+      - name: Prepare custom hook
+        run: chmod +x config/hooks/normal/0200-fevios-branding.hook.chroot
+
+      - name: Build FeviOS
+        run: |
+          set -o pipefail
+          sudo lb build 2>&1 | tee build.log
+        shell: bash
+
+      - name: Locate and validate ISO
+        id: iso
+        run: |
+          ISO="$(find . -maxdepth 1 -type f -name '*.iso' -printf '%f\n' | head -n 1)"
+          if [ -z "$ISO" ]; then
+            echo "No ISO was generated."
+            tail -n 150 build.log || true
+            exit 1
+          fi
+          test -s "$ISO"
+          echo "path=$ISO" >> "$GITHUB_OUTPUT"
+          echo "Built ISO: $ISO"
+          ls -lh "$ISO"
+
+      - name: Upload FeviOS ISO artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: FeviOS-ISO
+          path: ${{ steps.iso.outputs.path }}
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Upload build log if the build fails
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: FeviOS-build-log
+          path: build.log
+          if-no-files-found: ignore
+          retention-days: 7
