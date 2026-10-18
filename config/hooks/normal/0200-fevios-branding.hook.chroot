@@ -1,0 +1,30 @@
+#!/bin/sh
+set -eu
+
+# Give the live session a recognizable FeviOS identity.
+printf '%s\n' 'FeviOS Live Session' > /etc/issue
+printf '%s\n' 'FeviOS Live Session' > /etc/issue.net
+
+# Start Plank automatically for the live user and future users.
+install -d -m 0755 /etc/skel/.config/autostart
+cat > /etc/skel/.config/autostart/plank.desktop <<'EOF'
+[Desktop Entry]
+Type=Application
+Name=FeviOS Dock
+Comment=FeviOS application dock
+Exec=plank
+OnlyShowIn=XFCE;
+X-GNOME-Autostart-enabled=true
+EOF
+
+# Set a restrained dark theme and readable icon theme for new users.
+install -d -m 0755 /etc/skel/.config/gtk-3.0
+cat > /etc/skel/.config/gtk-3.0/settings.ini <<'EOF'
+[Settings]
+gtk-application-prefer-dark-theme=1
+gtk-theme-name=Adwaita-dark
+gtk-icon-theme-name=Papirus
+gtk-font-name=Noto Sans 10
+EOF
+
+exit 0
