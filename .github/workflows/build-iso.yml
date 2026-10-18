@@ -114,7 +114,7 @@ jobs:
       - name: Locate and validate ISO
         id: iso
         run: |
-          ISO="$(find . -maxdepth 1 -type f -name '*.iso' -printf '%f\\n' | head -n 1)"
+          ISO="$(find . -maxdepth 1 -type f -name '*.iso' -printf '%f\n' | head -n 1)"
           if [ -z "$ISO" ]; then
             echo "No ISO was generated."
             tail -n 150 build.log || true
