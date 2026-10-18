@@ -33,8 +33,8 @@ jobs:
       - name: Download official Google Chrome stable package
         run: |
           mkdir -p config/packages.chroot
-          curl --fail --location --retry 3 \\
-            "https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb" \\
+          curl --fail --location --retry 3 \
+            "https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb" \
             --output config/packages.chroot/google-chrome.deb
           test -s config/packages.chroot/google-chrome.deb
           ls -lh config/packages.chroot/google-chrome.deb
