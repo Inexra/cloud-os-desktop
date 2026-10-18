@@ -96,52 +96,11 @@ jobs:
 
       - name: Configure bootstrap packages
         run: |
-          # Debian Live reads stage-specific variables from config/bootstrap.
-          # Include GnuPG in the base filesystem before live-build configures APT.
-          cat > config/bootstrap <<'EOF'
-          LB_BOOTSTRAP_INCLUDE="gnupg"
-          EOF
+          # live-build reads stage-specific settings from config/bootstrap.
+          # GnuPG must be part of the base filesystem before the chroot APT stage.
+          printf '%s\n' 'LB_BOOTSTRAP_INCLUDE="gnupg"' > config/bootstrap
           cat config/bootstrap
-          grep -q '^LB_BOOTSTRAP_INCLUDE="gnupg"
-        run: chmod +x config/hooks/normal/0200-fevios-branding.hook.chroot
-
-      - name: Build FeviOS
-        run: |
-          set -o pipefail
-          sudo lb build 2>&1 | tee build.log
-        shell: bash
-
-      - name: Locate and validate ISO
-        id: iso
-        run: |
-          ISO="$(find . -maxdepth 1 -type f -name '*.iso' -printf '%f\n' | head -n 1)"
-          if [ -z "$ISO" ]; then
-            echo "No ISO was generated."
-            tail -n 150 build.log || true
-            exit 1
-          fi
-          test -s "$ISO"
-          echo "path=$ISO" >> "$GITHUB_OUTPUT"
-          echo "Built ISO: $ISO"
-          ls -lh "$ISO"
-
-      - name: Upload FeviOS ISO artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: FeviOS-ISO
-          path: ${{ steps.iso.outputs.path }}
-          if-no-files-found: error
-          retention-days: 7
-
-      - name: Upload build log if the build fails
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: FeviOS-build-log
-          path: build.log
-          if-no-files-found: ignore
-          retention-days: 7
- config/bootstrap
+          grep -Fxq 'LB_BOOTSTRAP_INCLUDE="gnupg"' config/bootstrap
 
       - name: Prepare custom hook
         run: chmod +x config/hooks/normal/0200-fevios-branding.hook.chroot
@@ -155,7 +114,7 @@ jobs:
       - name: Locate and validate ISO
         id: iso
         run: |
-          ISO="$(find . -maxdepth 1 -type f -name '*.iso' -printf '%f\n' | head -n 1)"
+          ISO="$(find . -maxdepth 1 -type f -name '*.iso' -printf '%f\\n' | head -n 1)"
           if [ -z "$ISO" ]; then
             echo "No ISO was generated."
             tail -n 150 build.log || true
