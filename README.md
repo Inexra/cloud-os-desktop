@@ -41,7 +41,8 @@ A live image is designed to run without modifying the internal drive, but bootin
 - Debian Stable base and XFCE desktop for modest hardware
 - Dark, uncluttered desktop with a dock
 - File manager, browser, terminal, settings and network controls
-- Java 21 development tools and BlueJ IDE for Java coursework (included in the image)
+- Java 21 development tools and BlueJ IDE for Java coursework
+- WordCraft word processor and DeckCraft presentation editor (included in the image)
 - Cloud ISO builds using GitHub Actions
 - No local Android Studio, Docker or Linux build environment required
 
@@ -50,6 +51,10 @@ A live image is designed to run without modifying the internal drive, but bootin
 The image build downloads the official BlueJ 6.0.1 Debian package from the BlueJ-Greenfoot GitHub release and includes it with OpenJDK 21 and OpenJFX. BlueJ is intended for 64-bit Intel/AMD systems. In the live session, look under **Applications → Development** or launch `bluej` from a terminal. A live session is temporary: files and installed changes may be lost on shutdown unless saved to another drive.
 
 Official BlueJ site: https://bluej.org/
+
+## WordCraft and DeckCraft
+
+FeviOS also downloads the x86-64 Debian packages for [WordCraft](https://github.com/storytold/wordcraft/releases/tag/v0.8.0), an open-source word processor for documents, and [DeckCraft](https://github.com/storytold/deckcraft/releases/tag/v0.8.0), an open-source presentation editor. Launch them from the Applications menu or search for their names. They are actively developed software, so check the release notes and keep backups of important work. The two installers add roughly 180 MB before ISO compression, so the final ISO will be larger.
 
 ## Roadmap
 
