@@ -5,6 +5,41 @@ set -eu
 printf '%s\n' 'FeviOS Live Session' > /etc/issue
 printf '%s\n' 'FeviOS Live Session' > /etc/issue.net
 
+# Set low-overhead XFCE compositor defaults for newly created users.
+install -d -m 0755 /etc/skel/.config/xfce4/xfconf/xfce-perchannel-xml
+cat > /etc/skel/.config/xfce4/xfconf/xfce-perchannel-xml/xfwm4.xml <<'EOF'
+<?xml version="1.0" encoding="UTF-8"?>
+<channel name="xfwm4" version="1.0">
+  <property name="general" type="empty">
+    <property name="use_compositing" type="bool" value="true"/>
+    <property name="vblank_mode" type="string" value="auto"/>
+    <property name="show_frame_shadow" type="bool" value="false"/>
+    <property name="show_popup_shadow" type="bool" value="false"/>
+  </property>
+</channel>
+EOF
+
+# Give Plank a modest, animated icon zoom without adding a second compositor.
+install -d -m 0755 /usr/local/bin
+cat > /usr/local/bin/fevios-dock <<'EOF'
+#!/bin/sh
+set -eu
+if command -v dconf >/dev/null 2>&1; then
+  dconf load /net/launchpad/plank/docks/dock1/ <<'CONF'
+[/]
+alignment='center'
+icon-size=44
+hide-mode='intelligent'
+items-alignment='center'
+position='bottom'
+zoom-enabled=true
+zoom-percent=135
+CONF
+fi
+exec plank
+EOF
+chmod 0755 /usr/local/bin/fevios-dock
+
 # Start Plank automatically for the live user and future users.
 install -d -m 0755 /etc/skel/.config/autostart
 cat > /etc/skel/.config/autostart/plank.desktop <<'EOF'
@@ -12,7 +47,7 @@ cat > /etc/skel/.config/autostart/plank.desktop <<'EOF'
 Type=Application
 Name=FeviOS Dock
 Comment=FeviOS application dock
-Exec=plank
+Exec=/usr/local/bin/fevios-dock
 OnlyShowIn=XFCE;
 X-GNOME-Autostart-enabled=true
 EOF
@@ -26,5 +61,12 @@ gtk-theme-name=Adwaita-dark
 gtk-icon-theme-name=Papirus
 gtk-font-name=Noto Sans 10
 EOF
+
+# Keep the live image responsive on machines with 4 GB RAM.
+install -d -m 0755 /etc/default
+if [ -f /etc/default/zramswap ]; then
+  sed -i 's/^#*ALGO=.*/ALGO=zstd/' /etc/default/zramswap || true
+  sed -i 's/^#*PERCENT=.*/PERCENT=50/' /etc/default/zramswap || true
+fi
 
 exit 0
