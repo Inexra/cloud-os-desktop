@@ -59,6 +59,15 @@ jobs:
           test -s config/packages.chroot/deckcraft_amd64.deb
           ls -lh config/packages.chroot/wordcraft_amd64.deb config/packages.chroot/deckcraft_amd64.deb
 
+      - name: Download SoundCraft audio workstation
+        run: |
+          mkdir -p config/packages.chroot
+          curl --fail --location --retry 3 \
+            "https://github.com/storytold/soundcraft/releases/download/v0.8.0/soundcraft-0.8.0-linux-x86_64.deb" \
+            --output config/packages.chroot/soundcraft_amd64.deb
+          test -s config/packages.chroot/soundcraft_amd64.deb
+          ls -lh config/packages.chroot/soundcraft_amd64.deb
+
       - name: Build FeviOS with Debian Trixie live-build
         shell: bash
         run: |
