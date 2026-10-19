@@ -5,7 +5,7 @@ set -eu
 printf '%s\n' 'FeviOS Live Session' > /etc/issue
 printf '%s\n' 'FeviOS Live Session' > /etc/issue.net
 
-# Set low-overhead XFCE compositor defaults for newly created users.
+# Lightweight XFCE compositor defaults: subtle, low-cost desktop effects.
 install -d -m 0755 /etc/skel/.config/xfce4/xfconf/xfce-perchannel-xml
 cat > /etc/skel/.config/xfce4/xfconf/xfce-perchannel-xml/xfwm4.xml <<'EOF'
 <?xml version="1.0" encoding="UTF-8"?>
@@ -15,44 +15,58 @@ cat > /etc/skel/.config/xfce4/xfconf/xfce-perchannel-xml/xfwm4.xml <<'EOF'
     <property name="vblank_mode" type="string" value="auto"/>
     <property name="show_frame_shadow" type="bool" value="false"/>
     <property name="show_popup_shadow" type="bool" value="false"/>
+    <property name="title_alignment" type="string" value="left"/>
   </property>
 </channel>
 EOF
 
-# Give Plank a modest, animated icon zoom without adding a second compositor.
-install -d -m 0755 /usr/local/bin
-cat > /usr/local/bin/fevios-dock <<'EOF'
-#!/bin/sh
-set -eu
-if command -v dconf >/dev/null 2>&1; then
-  dconf load /net/launchpad/plank/docks/dock1/ <<'CONF'
-[/]
-alignment='center'
-icon-size=44
-hide-mode='intelligent'
-items-alignment='center'
-position='bottom'
-zoom-enabled=true
-zoom-percent=135
-CONF
-fi
-exec plank
+# Configure a familiar Windows-like bottom panel for newly created users.
+# Keep XFCE's native panel instead of launching the extra Plank dock.
+install -d -m 0755 /etc/skel/.config/xfce4/xfconf/xfce-perchannel-xml
+cat > /etc/skel/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-panel.xml <<'EOF'
+<?xml version="1.0" encoding="UTF-8"?>
+<channel name="xfce4-panel" version="1.0">
+  <property name="configver" type="int" value="2"/>
+  <property name="panels" type="array">
+    <value type="int" value="1"/>
+  </property>
+  <property name="panels" type="array">
+    <property name="panel-1" type="empty">
+      <property name="position" type="string" value="p=10;x=0;y=0"/>
+      <property name="length" type="uint" value="100"/>
+      <property name="position-locked" type="bool" value="true"/>
+      <property name="size" type="uint" value="34"/>
+      <property name="icon-size" type="uint" value="22"/>
+      <property name="length-adjust" type="bool" value="false"/>
+      <property name="background-style" type="uint" value="0"/>
+      <property name="autohide-behavior" type="uint" value="0"/>
+      <property name="plugin-ids" type="array">
+        <value type="int" value="1"/>
+        <value type="int" value="2"/>
+        <value type="int" value="3"/>
+        <value type="int" value="4"/>
+        <value type="int" value="5"/>
+      </property>
+    </property>
+  </property>
+  <property name="plugins" type="empty">
+    <property name="plugin-1" type="string" value="whiskermenu"/>
+    <property name="plugin-2" type="string" value="tasklist"/>
+    <property name="plugin-3" type="string" value="separator">
+      <property name="style" type="uint" value="0"/>
+      <property name="expand" type="bool" value="true"/>
+      <property name="transparent" type="bool" value="true"/>
+    </property>
+    <property name="plugin-4" type="string" value="systray"/>
+    <property name="plugin-5" type="string" value="clock"/>
+  </property>
+</channel>
 EOF
-chmod 0755 /usr/local/bin/fevios-dock
 
-# Start Plank automatically for the live user and future users.
-install -d -m 0755 /etc/skel/.config/autostart
-cat > /etc/skel/.config/autostart/plank.desktop <<'EOF'
-[Desktop Entry]
-Type=Application
-Name=FeviOS Dock
-Comment=FeviOS application dock
-Exec=/usr/local/bin/fevios-dock
-OnlyShowIn=XFCE;
-X-GNOME-Autostart-enabled=true
-EOF
+# Disable the previous macOS-style dock autostart in the skeleton profile.
+rm -f /etc/skel/.config/autostart/plank.desktop
 
-# Prefer Google Chrome for web links and HTML content for new users.
+# Create an application-menu label that feels familiar while staying lightweight.
 install -d -m 0755 /etc/skel/.config/xfce4
 cat > /etc/skel/.config/xfce4/helpers.rc <<'EOF'
 WebBrowser=google-chrome.desktop
@@ -66,7 +80,7 @@ x-scheme-handler/http=google-chrome.desktop
 x-scheme-handler/https=google-chrome.desktop
 EOF
 
-# Set a restrained dark theme and readable icon theme for new users.
+# Use a restrained dark theme, readable font, and familiar folder icons.
 install -d -m 0755 /etc/skel/.config/gtk-3.0
 cat > /etc/skel/.config/gtk-3.0/settings.ini <<'EOF'
 [Settings]
@@ -76,7 +90,7 @@ gtk-icon-theme-name=Papirus
 gtk-font-name=Noto Sans 10
 EOF
 
-# Keep the live image responsive on machines with 4 GB RAM.
+# Keep swap compression efficient on low-memory laptops where zramswap is configured.
 install -d -m 0755 /etc/default
 if [ -f /etc/default/zramswap ]; then
   sed -i 's/^#*ALGO=.*/ALGO=zstd/' /etc/default/zramswap || true
