@@ -1,5 +1,6 @@
-# FeviOS lightweight desktop and essential utilities
+# FeviOS lightweight Windows-inspired desktop and essential utilities
 xfce4
+xfce4-whiskermenu-plugin
 lightdm
 lightdm-gtk-greeter
 plank
