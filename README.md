@@ -45,7 +45,8 @@ A live image is designed to run without modifying the internal drive, but bootin
 - Google Chrome as the default browser, plus VLC media player for video and audio
 - File manager, terminal, settings and network controls
 - Java 21 development tools and BlueJ IDE for Java coursework
-- WordCraft word processor and DeckCraft presentation editor (included in the image)
+- WordCraft word processor and DeckCraft presentation editor
+- SoundCraft audio workstation
 - Cloud ISO builds using GitHub Actions
 - No local Android Studio, Docker or Linux build environment required
 
@@ -63,7 +64,13 @@ Official BlueJ site: https://bluej.org/
 
 ## WordCraft and DeckCraft
 
-FeviOS also downloads the x86-64 Debian packages for [WordCraft](https://github.com/storytold/wordcraft/releases/tag/v0.8.0), an open-source word processor for documents, and [DeckCraft](https://github.com/storytold/deckcraft/releases/tag/v0.8.0), an open-source presentation editor. Launch them from the Applications menu or search for their names. They are actively developed software, so check the release notes and keep backups of important work. The two installers add roughly 180 MB before ISO compression, so the final ISO will be larger.
+FeviOS downloads the x86-64 Debian packages for [WordCraft](https://github.com/storytold/wordcraft/releases/tag/v0.8.0), an open-source word processor for documents, and [DeckCraft](https://github.com/storytold/deckcraft/releases/tag/v0.8.0), an open-source presentation editor. Launch them from the Applications menu or search for their names. They are actively developed software, so check release notes and keep backups of important work. The two installers add roughly 180 MB before ISO compression, so the final ISO will be larger.
+
+## SoundCraft
+
+FeviOS downloads the x86-64 Debian package for [SoundCraft](https://github.com/storytold/soundcraft/releases/tag/v0.8.0), an open-source digital audio workstation inspired by Pro Tools, and includes it in the live image. Search for **SoundCraft** in the Applications menu after booting.
+
+**Important:** SoundCraft v0.8.0 is still pre-alpha software, not a mature or production-ready DAW. Audio-device support, recording, plugins and project compatibility may have bugs; test it with non-critical projects and keep backups. A digital audio workstation can also use significant RAM and CPU, so performance on the target 4 GB laptop is not guaranteed. This is an x86-64 package for Intel/AMD PCs.
 
 ## Performance targets
 
@@ -71,7 +78,7 @@ FeviOS also downloads the x86-64 Debian packages for [WordCraft](https://github.
 - Kept XFCE's built-in compositor rather than adding another animation compositor, with window shadows disabled to reduce extra drawing.
 - Configured Plank dock icon zoom for a restrained animated effect.
 - Added zram swap tooling to help the 4 GB laptop cope with memory pressure. Compression uses CPU time, so performance must be checked on the actual machine.
-- The target is less than 1 GB RAM at an idle desktop after login, with no browser, BlueJ, WordCraft or DeckCraft windows open. This cannot be promised from configuration alone: RAM readings vary by hardware, drivers, live-session cache and the measurement method.
+- The target is less than 1 GB RAM at an idle desktop after login, with no browser, BlueJ, WordCraft, DeckCraft or SoundCraft windows open. This cannot be promised from configuration alone: RAM readings vary by hardware, drivers, live-session cache and the measurement method.
 
 ## Roadmap
 
