@@ -1,98 +1,73 @@
 #!/bin/sh
 set -eu
 
-# Give the live session a recognizable FeviOS identity.
-printf '%s\n' 'FeviOS Live Session' > /etc/issue
-printf '%s\n' 'FeviOS Live Session' > /etc/issue.net
+printf '%s\n' 'FeviOS Lite Live Session' > /etc/issue
+printf '%s\n' 'FeviOS Lite Live Session' > /etc/issue.net
 
-# Lightweight XFCE compositor defaults: subtle, low-cost desktop effects.
-install -d -m 0755 /etc/skel/.config/xfce4/xfconf/xfce-perchannel-xml
-cat > /etc/skel/.config/xfce4/xfconf/xfce-perchannel-xml/xfwm4.xml <<'EOF'
+# Start a simple Openbox session with a small panel and no compositor.
+install -d -m 0755 /etc/skel/.config/openbox
+cat > /etc/skel/.config/openbox/autostart <<'EOF'
+# No compositor or desktop search daemon is started to keep idle RAM low.
+tint2 &
+EOF
+
+cat > /etc/skel/.config/openbox/rc.xml <<'EOF'
 <?xml version="1.0" encoding="UTF-8"?>
-<channel name="xfwm4" version="1.0">
-  <property name="general" type="empty">
-    <property name="use_compositing" type="bool" value="true"/>
-    <property name="vblank_mode" type="string" value="auto"/>
-    <property name="show_frame_shadow" type="bool" value="false"/>
-    <property name="show_popup_shadow" type="bool" value="false"/>
-    <property name="title_alignment" type="string" value="left"/>
-  </property>
-</channel>
+<openbox_config xmlns="http://openbox.org/3.4/rc">
+  <resistance><strength>10</strength></resistance>
+  <focus><focusNew>yes</focusNew><followMouse>no</followMouse><focusLast>yes</focusLast><underMouse>no</underMouse><照>no</照></focus>
+  <placement><policy>Smart</policy><center>yes</center></placement>
+  <theme><name>Clearlooks</name><titleLayout>NLIMC</titleLayout><keepBorder>yes</keepBorder><animateIconify>no</animateIconify></theme>
+  <desktops><number>1</number><firstdesk>1</firstdesk><names><name>FeviOS Lite</name></names></desktops>
+  <resize><drawContents>yes</drawContents></resize>
+  <margins><top>0</top><bottom>0</bottom><left>0</left><right>0</right></margins>
+  <keyboard><keybind key="W-space"><action name="Execute"><command>rofi -show drun</command></action></keybind><keybind key="W-e"><action name="Execute"><command>pcmanfm</command></action></keybind><keybind key="W-t"><action name="Execute"><command>lxterminal</command></action></keybind><keybind key="A-F4"><action name="Close"/></keybind></keyboard>
+  <mouse><dragThreshold>1</dragThreshold><doubleClickTime>200</doubleClickTime><screenEdgeWarpTime>400</screenEdgeWarpTime><screenEdgeWarpMouse>yes</screenEdgeWarpMouse></mouse>
+</openbox_config>
 EOF
 
-# Configure a familiar Windows-like bottom panel for newly created users.
-# Keep XFCE's native panel instead of launching the extra Plank dock.
-install -d -m 0755 /etc/skel/.config/xfce4/xfconf/xfce-perchannel-xml
-cat > /etc/skel/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-panel.xml <<'EOF'
-<?xml version="1.0" encoding="UTF-8"?>
-<channel name="xfce4-panel" version="1.0">
-  <property name="configver" type="int" value="2"/>
-  <property name="panels" type="array">
-    <value type="int" value="1"/>
-    <property name="panel-1" type="empty">
-      <property name="position" type="string" value="p=10;x=0;y=0"/>
-      <property name="length" type="uint" value="100"/>
-      <property name="position-locked" type="bool" value="true"/>
-      <property name="size" type="uint" value="34"/>
-      <property name="icon-size" type="uint" value="22"/>
-      <property name="length-adjust" type="bool" value="false"/>
-      <property name="background-style" type="uint" value="0"/>
-      <property name="autohide-behavior" type="uint" value="0"/>
-      <property name="plugin-ids" type="array">
-        <value type="int" value="1"/>
-        <value type="int" value="2"/>
-        <value type="int" value="3"/>
-        <value type="int" value="4"/>
-        <value type="int" value="5"/>
-      </property>
-    </property>
-  </property>
-  <property name="plugins" type="empty">
-    <property name="plugin-1" type="string" value="whiskermenu"/>
-    <property name="plugin-2" type="string" value="tasklist"/>
-    <property name="plugin-3" type="string" value="separator">
-      <property name="style" type="uint" value="0"/>
-      <property name="expand" type="bool" value="true"/>
-      <property name="transparent" type="bool" value="true"/>
-    </property>
-    <property name="plugin-4" type="string" value="systray"/>
-    <property name="plugin-5" type="string" value="clock"/>
-  </property>
-</channel>
+install -d -m 0755 /etc/skel/.config/tint2
+cat > /etc/skel/.config/tint2/tint2rc <<'EOF'
+panel_items = TSC
+panel_monitor = all
+panel_position = bottom center horizontal
+panel_size = 100% 30
+panel_margin = 0 0
+panel_padding = 4 2 4
+font_shadow = 0
+background_color = #171a21 92
+border_color = #303642 100
+rounded = 0
+border_width = 0
+taskbar_mode = single_desktop
+taskbar_padding = 3 2 3
+task_background_id = 0
+task_active_background_id = 0
+task_icon = 1
+task_text = 1
+task_maximum_size = 180 30
+systray_padding = 4 2 4
+clock_format = %H:%M
 EOF
 
-# Disable the previous macOS-style dock autostart in the skeleton profile.
-rm -f /etc/skel/.config/autostart/plank.desktop
-
-# Create an application-menu label that feels familiar while staying lightweight.
-install -d -m 0755 /etc/skel/.config/xfce4
-cat > /etc/skel/.config/xfce4/helpers.rc <<'EOF'
-WebBrowser=google-chrome.desktop
-EOF
-install -d -m 0755 /etc/skel/.config
-cat > /etc/skel/.config/mimeapps.list <<'EOF'
-[Default Applications]
-text/html=google-chrome.desktop
-application/xhtml+xml=google-chrome.desktop
-x-scheme-handler/http=google-chrome.desktop
-x-scheme-handler/https=google-chrome.desktop
-EOF
-
-# Use a restrained dark theme, readable font, and familiar folder icons.
+# Use a dark GTK appearance without enabling compositing or animations.
 install -d -m 0755 /etc/skel/.config/gtk-3.0
 cat > /etc/skel/.config/gtk-3.0/settings.ini <<'EOF'
 [Settings]
 gtk-application-prefer-dark-theme=1
 gtk-theme-name=Adwaita-dark
-gtk-icon-theme-name=Papirus
-gtk-font-name=Noto Sans 10
+gtk-icon-theme-name=Adwaita
+gtk-font-name=DejaVu Sans 10
+gtk-enable-animations=0
 EOF
 
-# Keep swap compression efficient on low-memory laptops where zramswap is configured.
-install -d -m 0755 /etc/default
+# Configure conservative zram defaults when the package provides this file.
 if [ -f /etc/default/zramswap ]; then
   sed -i 's/^#*ALGO=.*/ALGO=zstd/' /etc/default/zramswap || true
   sed -i 's/^#*PERCENT=.*/PERCENT=50/' /etc/default/zramswap || true
 fi
+
+# Remove optional desktop helpers that would pull in heavier components.
+rm -f /etc/skel/.config/autostart/plank.desktop
 
 exit 0
