@@ -4,70 +4,179 @@ set -eu
 printf '%s\n' 'FeviOS Lite Live Session' > /etc/issue
 printf '%s\n' 'FeviOS Lite Live Session' > /etc/issue.net
 
-# Start a simple Openbox session with a small panel and no compositor.
+# Polished, restrained Openbox session. Picom adds subtle shadows and fades.
 install -d -m 0755 /etc/skel/.config/openbox
 cat > /etc/skel/.config/openbox/autostart <<'EOF'
-# No compositor or desktop search daemon is started to keep idle RAM low.
+# Custom vector wallpaper: crisp at any screen resolution.
+feh --no-fehbg --bg-fill /usr/share/backgrounds/fevios-lite.svg &
+# Lightweight compositor: subtle shadows and short fades, no blur.
+picom --backend xrender --vsync --shadow --shadow-radius 12 --shadow-opacity 0.22 --fading --fade-in-step 0.08 --fade-out-step 0.08 --inactive-opacity 0.96 --active-opacity 1.0 &
+# Slim bottom panel.
 tint2 &
 EOF
 
 cat > /etc/skel/.config/openbox/rc.xml <<'EOF'
 <?xml version="1.0" encoding="UTF-8"?>
 <openbox_config xmlns="http://openbox.org/3.4/rc">
-  <resistance><strength>10</strength></resistance>
+  <resistance><strength>8</strength></resistance>
   <focus><focusNew>yes</focusNew><followMouse>no</followMouse><focusLast>yes</focusLast><underMouse>no</underMouse></focus>
   <placement><policy>Smart</policy><center>yes</center></placement>
-  <theme><name>Clearlooks</name><titleLayout>NLIMC</titleLayout><keepBorder>yes</keepBorder><animateIconify>no</animateIconify></theme>
-  <desktops><number>1</number><firstdesk>1</firstdesk><names><name>FeviOS Lite</name></names></desktops>
+  <theme>
+    <name>Clearlooks</name><titleLayout>NLIMC</titleLayout>
+    <keepBorder>yes</keepBorder><animateIconify>yes</animateIconify>
+    <font place="ActiveWindow"><name>DejaVu Sans</name><size>10</size><weight>Bold</weight><slant>Normal</slant></font>
+    <font place="InactiveWindow"><name>DejaVu Sans</name><size>10</size><weight>Normal</weight><slant>Normal</slant></font>
+    <font place="MenuHeader"><name>DejaVu Sans</name><size>10</size><weight>Bold</weight><slant>Normal</slant></font>
+    <font place="MenuItem"><name>DejaVu Sans</name><size>10</size><weight>Normal</weight><slant>Normal</slant></font>
+    <font place="ActiveOnScreenDisplay"><name>DejaVu Sans</name><size>10</size><weight>Bold</weight><slant>Normal</slant></font>
+    <font place="InactiveOnScreenDisplay"><name>DejaVu Sans</name><size>10</size><weight>Normal</weight><slant>Normal</slant></font>
+  </theme>
+  <desktops><number>1</number><firstdesk>1</firstdesk><names><name>FeviOS</name></names></desktops>
   <resize><drawContents>yes</drawContents></resize>
   <margins><top>0</top><bottom>0</bottom><left>0</left><right>0</right></margins>
-  <keyboard><keybind key="W-space"><action name="Execute"><command>rofi -show drun</command></action></keybind><keybind key="W-e"><action name="Execute"><command>pcmanfm</command></action></keybind><keybind key="W-t"><action name="Execute"><command>lxterminal</command></action></keybind><keybind key="A-F4"><action name="Close"/></keybind></keyboard>
+  <keyboard>
+    <keybind key="W-space"><action name="Execute"><command>rofi -show drun</command></action></keybind>
+    <keybind key="W-e"><action name="Execute"><command>pcmanfm</command></action></keybind>
+    <keybind key="W-t"><action name="Execute"><command>lxterminal</command></action></keybind>
+    <keybind key="W-r"><action name="Execute"><command>rofi -show run</command></action></keybind>
+    <keybind key="A-F4"><action name="Close"/></keybind>
+    <keybind key="W-d"><action name="ToggleShowDesktop"/></keybind>
+  </keyboard>
   <mouse><dragThreshold>1</dragThreshold><doubleClickTime>200</doubleClickTime><screenEdgeWarpTime>400</screenEdgeWarpTime><screenEdgeWarpMouse>yes</screenEdgeWarpMouse></mouse>
 </openbox_config>
 EOF
 
+# Minimal dock-like task panel. Rounded shadows are supplied by picom, not the panel.
 install -d -m 0755 /etc/skel/.config/tint2
 cat > /etc/skel/.config/tint2/tint2rc <<'EOF'
-panel_items = TSC
+panel_items = LTSC
 panel_monitor = all
 panel_position = bottom center horizontal
-panel_size = 100% 30
-panel_margin = 0 0
-panel_padding = 4 2 4
+panel_size = 96% 38
+panel_margin = 0 7
+panel_padding = 8 5 8
 font_shadow = 0
-background_color = #171a21 92
-border_color = #303642 100
-rounded = 0
-border_width = 0
+font = DejaVu Sans 9
+background_color = #111522 82
+border_color = #7d8bb5 20
+rounded = 12
+border_width = 1
+background_id = 1
+# Single subtle translucent background for the panel and tasks.
+rounded = 12
+border_width = 1
+background_color = #111522 88
+border_color = #333d59 50
 taskbar_mode = single_desktop
-taskbar_padding = 3 2 3
+taskbar_padding = 4 3 4
 task_background_id = 0
 task_active_background_id = 0
 task_icon = 1
-task_text = 1
-task_maximum_size = 180 30
-systray_padding = 4 2 4
+task_text = 0
+task_maximum_size = 44 30
+task_centered = 1
+task_padding = 6 4 6
+task_font = DejaVu Sans 9
+systray_padding = 5 3 5
 clock_format = %H:%M
 EOF
 
-# Use a dark GTK appearance without enabling compositing or animations.
+# Consistent Rofi launcher styling.
+install -d -m 0755 /etc/skel/.config/rofi
+cat > /etc/skel/.config/rofi/config.rasi <<'EOF'
+configuration {
+  modi: "drun,run,window";
+  show-icons: true;
+  icon-theme: "Papirus-Dark";
+  display-drun: "Apps";
+  display-run: "Run";
+  drun-display-format: "{name}";
+  disable-history: false;
+  matching: "fuzzy";
+}
+* {
+  bg: #111522f2;
+  bg-alt: #20283a;
+  fg: #edf1ff;
+  accent: #8ca8ff;
+  border: #465579;
+  background-color: @bg;
+  text-color: @fg;
+  font: "DejaVu Sans 11";
+}
+window {
+  width: 620px;
+  border: 1px;
+  border-color: @border;
+  border-radius: 16px;
+  padding: 18px;
+}
+mainbox { spacing: 12px; children: [inputbar, listview]; }
+inputbar {
+  padding: 12px;
+  border-radius: 10px;
+  background-color: @bg-alt;
+  children: [prompt, entry];
+  spacing: 10px;
+}
+entry { placeholder: "Search applications…"; }
+listview { lines: 7; columns: 1; fixed-height: true; spacing: 5px; }
+element { padding: 9px; border-radius: 8px; }
+element selected { background-color: @accent; text-color: #101522; }
+element-icon { size: 24px; }
+EOF
+
+# GTK applications: dark palette, modern icons and restrained animation.
 install -d -m 0755 /etc/skel/.config/gtk-3.0
 cat > /etc/skel/.config/gtk-3.0/settings.ini <<'EOF'
 [Settings]
 gtk-application-prefer-dark-theme=1
 gtk-theme-name=Adwaita-dark
-gtk-icon-theme-name=Adwaita
+gtk-icon-theme-name=Papirus-Dark
 gtk-font-name=DejaVu Sans 10
-gtk-enable-animations=0
+gtk-enable-animations=1
+gtk-cursor-theme-name=Adwaita
+gtk-cursor-theme-size=24
 EOF
 
-# Configure conservative zram defaults when the package provides this file.
+# A custom lightweight SVG wallpaper, generated locally during the ISO build.
+install -d -m 0755 /usr/share/backgrounds
+cat > /usr/share/backgrounds/fevios-lite.svg <<'EOF'
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080">
+ <defs>
+  <linearGradient id="base" x1="0" y1="0" x2="1" y2="1">
+   <stop offset="0" stop-color="#090e1d"/><stop offset=".52" stop-color="#151b35"/><stop offset="1" stop-color="#080d18"/>
+  </linearGradient>
+  <radialGradient id="glow">
+   <stop offset="0" stop-color="#4e71df" stop-opacity=".72"/><stop offset=".45" stop-color="#7650d8" stop-opacity=".28"/><stop offset="1" stop-color="#151b35" stop-opacity="0"/>
+  </radialGradient>
+  <linearGradient id="ribbon" x1="0" y1="0" x2="1" y2="1">
+   <stop offset="0" stop-color="#8db8ff" stop-opacity=".88"/><stop offset=".5" stop-color="#7968ed" stop-opacity=".48"/><stop offset="1" stop-color="#47d9dc" stop-opacity=".12"/>
+  </linearGradient>
+  <filter id="soft"><feGaussianBlur stdDeviation="42"/></filter>
+  <linearGradient id="edge" x1="0" y1="0" x2="1" y2="1">
+   <stop offset="0" stop-color="#ffffff" stop-opacity=".20"/><stop offset="1" stop-color="#ffffff" stop-opacity=".015"/>
+  </linearGradient>
+ </defs>
+ <rect width="1920" height="1080" fill="url(#base)"/>
+ <ellipse cx="1290" cy="450" rx="630" ry="520" fill="url(#glow)"/>
+ <ellipse cx="410" cy="970" rx="480" ry="350" fill="#263b91" opacity=".24" filter="url(#soft)"/>
+ <path d="M-100 790 C250 530 500 950 830 670 S1370 250 2040 360 L2040 680 C1480 560 1280 970 850 930 S260 730 -100 1020Z" fill="url(#ribbon)" opacity=".52"/>
+ <path d="M-100 860 C270 600 510 1010 860 730 S1430 340 2040 440" fill="none" stroke="#9bbaff" stroke-opacity=".35" stroke-width="2"/>
+ <path d="M-100 900 C270 650 510 1060 860 780 S1430 390 2040 490" fill="none" stroke="#70e4e2" stroke-opacity=".22" stroke-width="1.5"/>
+ <circle cx="1390" cy="380" r="235" fill="none" stroke="url(#edge)" stroke-width="1.5"/>
+ <circle cx="1390" cy="380" r="195" fill="none" stroke="#a4baff" stroke-opacity=".12" stroke-width="1"/>
+ <circle cx="1390" cy="380" r="150" fill="#4e71df" fill-opacity=".07"/>
+ <g fill="#dce7ff" opacity=".42"><circle cx="290" cy="220" r="2"/><circle cx="420" cy="300" r="1.5"/><circle cx="1630" cy="180" r="2"/><circle cx="1740" cy="300" r="1.5"/><circle cx="1140" cy="160" r="1.5"/><circle cx="720" cy="180" r="1.5"/></g>
+ <text x="110" y="150" fill="#dce6ff" opacity=".86" font-family="DejaVu Sans, sans-serif" font-size="19" letter-spacing="7">FEVIOS LITE</text>
+ <text x="112" y="183" fill="#aebde6" opacity=".62" font-family="DejaVu Sans, sans-serif" font-size="12" letter-spacing="3">LESS NOISE. MORE ROOM.</text>
+</svg>
+EOF
+
+# Configure zram where the Debian package provides its defaults.
 if [ -f /etc/default/zramswap ]; then
   sed -i 's/^#*ALGO=.*/ALGO=zstd/' /etc/default/zramswap || true
   sed -i 's/^#*PERCENT=.*/PERCENT=50/' /etc/default/zramswap || true
 fi
-
-# Remove optional desktop helpers that would pull in heavier components.
-rm -f /etc/skel/.config/autostart/plank.desktop
 
 exit 0
