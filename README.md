@@ -1,67 +1,65 @@
 # FeviOS Lite
 
-**A deliberately minimal Debian-based Linux live system for older PCs.**
+**A lightweight Debian-based Linux desktop with a custom modern look.**
 
-FeviOS Lite is the lightweight edition of FeviOS, built from official Debian Stable (Trixie) packages and the standard Linux kernel. It uses Openbox, tint2 and a small set of desktop utilities rather than a full desktop environment.
+FeviOS Lite is built from official Debian Trixie packages and the standard Linux kernel. It deliberately avoids XFCE and other full desktop environments. The desktop uses Openbox, tint2, Rofi and PCManFM with a custom vector wallpaper, dark GTK settings, Papirus icons and a low-cost Picom compositor.
+
+## Design goals
+
+- Dark navy and blue-violet visual identity with custom SVG wallpaper
+- Slim translucent-looking bottom dock/taskbar
+- Rofi application launcher (Super + Space) with icons and fuzzy search
+- Subtle window shadows and short fade transitions via Picom
+- Keyboard shortcuts and clean dark GTK application styling
+- No XFCE, GNOME, KDE or heavy desktop environment
+- No blur effects, desktop search indexing or heavyweight dock
+
+The compositor is intentionally configured with the XRender backend for older integrated graphics. If Picom causes tearing or uses too much memory on the target laptop, it can be disabled while keeping the rest of the visual theme.
 
 ## Target hardware
 
-- HP 15-series laptop
-- Intel Pentium 3825U-class processor
-- 4 GB RAM
-- 500 GB HDD
+- HP 15-series laptop, Intel Pentium 3825U-class processor
+- 4 GB RAM, 500 GB HDD
 - 64-bit x86 PC
 
-## Main goal
+## Performance target
 
-The initial performance target is **less than 500 MB RAM at idle after boot and login**. This is a target, not a verified guarantee. Actual memory use depends on the kernel, firmware, display driver, hardware, live-session services and how RAM is measured. We will measure it on real hardware before claiming success.
-
-## Lightweight design
-
-- Debian Trixie base and official Debian repositories
-- Openbox window manager
-- tint2 panel
-- Rofi application launcher (Super + Space)
-- PCManFM file manager (Super + E)
-- LXTerminal (Super + T)
-- NetworkManager and Wi-Fi support
-- PulseAudio and basic ALSA tools
-- zram swap support
-- No compositor, desktop search indexer or dock
-- APT package manager
-- Firmware packages enabled for broad hardware support
-- APT recommends disabled to reduce unnecessary packages
+The goal is **less than 500 MB RAM at idle after boot and login**. This has to be verified on the actual laptop and is not guaranteed by the configuration alone. The compositor, display driver, firmware and live-session services all affect memory usage.
 
 ## Build using GitHub Actions
 
-1. Open the [FeviOS Lite repository branch](https://github.com/Inexra/cloud-os-desktop/tree/fevios-lite).
-2. Open **Actions**.
-3. Select **Build FeviOS Lite ISO**.
-4. Choose **Run workflow** on the `fevios-lite` branch.
-5. Download the `FeviOS-Lite-ISO` artifact after a successful run.
-6. Extract the ZIP to obtain the ISO.
+1. Open the [FeviOS Lite branch](https://github.com/Inexra/cloud-os-desktop/tree/fevios-lite).
+2. Open **Actions** and choose **Build FeviOS Lite ISO**.
+3. Run the workflow on branch `fevios-lite`.
+4. Download the `FeviOS-Lite-ISO` artifact after a successful build.
+5. Extract the ZIP to obtain the ISO.
 
 If the build fails, download the `FeviOS-Lite-build-log` artifact and inspect the last error.
 
+## Keyboard shortcuts
+
+- **Super + Space:** app launcher
+- **Super + E:** file manager
+- **Super + T:** terminal
+- **Super + R:** run command
+- **Super + D:** show desktop
+- **Alt + F4:** close focused window
+
 ## Safe testing
 
-- Keep Windows and the internal drive untouched.
-- Use a separate USB drive for testing.
-- Choose the live/try session and do not start an installer.
-- Do not erase or repartition any disk.
-- Back up important files before any future installation work.
+Use a separate USB drive and boot the live session without starting an installer. Keep Windows and the internal drive untouched. Back up important files before any future installation.
 
 ## Applications
 
-The first image prioritizes boot speed and low idle RAM. Large applications such as Chrome, VLC, Java, BlueJ, WordCraft and DeckCraft are intentionally not preinstalled in this minimal edition. They can be added in later optional editions or installed with APT when internet access and sufficient storage are available. Running browsers, Java IDEs and media editors will naturally use more RAM than the idle desktop.
+This edition prioritizes a light base. Chrome, VLC, Java/BlueJ, WordCraft, DeckCraft and other large applications are not preinstalled. They can be added as optional packages after the base image boots reliably. Browser and IDE usage will require more RAM than the idle desktop.
 
 ## Roadmap
 
-1. Produce a repeatable bootable ISO.
-2. Test live boot, display, Wi-Fi, sound, touchpad and suspend on the HP laptop.
-3. Measure idle RAM using `free -h` and `/usr/bin/time` where appropriate.
-4. Tune startup services based on measured results.
-5. Add an optional applications bundle without increasing the minimal image by default.
-6. Consider an installer only after live USB testing is reliable.
+1. Build and validate a bootable ISO.
+2. Test display, Wi-Fi, sound, touchpad and suspend on the HP laptop.
+3. Measure idle RAM with `free -h`.
+4. Compare memory with Picom enabled and disabled.
+5. Tune startup services from real measurements.
+6. Add optional software bundles and consider an installer after live testing.
 
-FeviOS Lite is an early development project and is not yet certified for production use. Debian and other upstream projects retain their respective trademarks and licenses.
+FeviOS Lite is an early development project and is not yet certified for production use. Debian and upstream projects retain their respective trademarks and licenses.
