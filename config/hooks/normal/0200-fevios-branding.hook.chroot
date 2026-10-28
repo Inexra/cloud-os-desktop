@@ -8,7 +8,8 @@ printf '%s\n' 'FeviOS Lite Live Session' > /etc/issue.net
 install -d -m 0755 /etc/skel/.config/openbox
 cat > /etc/skel/.config/openbox/autostart <<'EOF'
 # Custom vector wallpaper: crisp at any screen resolution.
-feh --no-fehbg --bg-fill /usr/share/backgrounds/fevios-lite.svg &
+rsvg-convert -o /usr/share/backgrounds/fevios-lite.png /usr/share/backgrounds/fevios-lite.svg
+feh --no-fehbg --bg-fill /usr/share/backgrounds/fevios-lite.png &
 # Lightweight compositor: subtle shadows and short fades, no blur.
 picom --backend xrender --vsync --shadow --shadow-radius 12 --shadow-opacity 0.22 --fading --fade-in-step 0.08 --fade-out-step 0.08 --inactive-opacity 0.96 --active-opacity 1.0 &
 # Slim bottom panel.
@@ -49,7 +50,7 @@ EOF
 # Minimal dock-like task panel. Rounded shadows are supplied by picom, not the panel.
 install -d -m 0755 /etc/skel/.config/tint2
 cat > /etc/skel/.config/tint2/tint2rc <<'EOF'
-panel_items = LTSC
+panel_items = TSC
 panel_monitor = all
 panel_position = bottom center horizontal
 panel_size = 96% 38
