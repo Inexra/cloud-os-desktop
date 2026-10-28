@@ -1,8 +1,8 @@
-# FeviOS
+# FeviOS Lite
 
-**A lightweight, macOS-inspired Linux desktop for older laptops.**
+**A deliberately minimal Debian-based Linux live system for older PCs.**
 
-FeviOS is a community-built Debian Live image customized with XFCE, a dock, a simple dark theme and practical desktop applications. The first milestone is a bootable ISO that can be tested without installing or modifying Windows.
+FeviOS Lite is the lightweight edition of FeviOS, built from official Debian Stable (Trixie) packages and the standard Linux kernel. It uses Openbox, tint2 and a small set of desktop utilities rather than a full desktop environment.
 
 ## Target hardware
 
@@ -10,82 +10,58 @@ FeviOS is a community-built Debian Live image customized with XFCE, a dock, a si
 - Intel Pentium 3825U-class processor
 - 4 GB RAM
 - 500 GB HDD
-- 64-bit x86 PC (confirm your exact CPU model before installing)
+- 64-bit x86 PC
 
-## Current status
+## Main goal
 
-This is an early development build, not a finished or production-certified operating system. The desktop is being tuned for low idle memory use with a target below 1 GB after login, but this is a goal rather than a verified guarantee until measured on the laptop. GitHub Actions builds a bootable ISO and publishes it as a workflow artifact. The image must be tested on real hardware before considering installation.
+The initial performance target is **less than 500 MB RAM at idle after boot and login**. This is a target, not a verified guarantee. Actual memory use depends on the kernel, firmware, display driver, hardware, live-session services and how RAM is measured. We will measure it on real hardware before claiming success.
 
-## Build FeviOS
+## Lightweight design
 
-1. Open the **Actions** tab in this repository.
-2. Select **Build FeviOS ISO**.
-3. Select **Run workflow** and run it on the `main` branch.
-4. When the workflow completes, open the run and download the `FeviOS-ISO` artifact.
-5. Extract the artifact ZIP to get the ISO file.
+- Debian Trixie base and official Debian repositories
+- Openbox window manager
+- tint2 panel
+- Rofi application launcher (Super + Space)
+- PCManFM file manager (Super + E)
+- LXTerminal (Super + T)
+- NetworkManager and Wi-Fi support
+- PulseAudio and basic ALSA tools
+- zram swap support
+- No compositor, desktop search indexer or dock
+- APT package manager
+- Firmware packages enabled for broad hardware support
+- APT recommends disabled to reduce unnecessary packages
 
-The workflow also runs after relevant project files are pushed.
+## Build using GitHub Actions
+
+1. Open the [FeviOS Lite repository branch](https://github.com/Inexra/cloud-os-desktop/tree/fevios-lite).
+2. Open **Actions**.
+3. Select **Build FeviOS Lite ISO**.
+4. Choose **Run workflow** on the `fevios-lite` branch.
+5. Download the `FeviOS-Lite-ISO` artifact after a successful run.
+6. Extract the ZIP to obtain the ISO.
+
+If the build fails, download the `FeviOS-Lite-build-log` artifact and inspect the last error.
 
 ## Safe testing
 
-- Keep your existing Windows installation and files untouched.
-- First test the ISO in a virtual machine if possible.
-- To test on the laptop, use a separate USB drive and choose a one-time boot option only if you are comfortable doing so. No BIOS changes are part of this development step.
-- Choose a **live / try** session and do not start the installer.
-- Never select disk erase, repartition or install options until you have a verified backup and have deliberately decided to install FeviOS.
+- Keep Windows and the internal drive untouched.
+- Use a separate USB drive for testing.
+- Choose the live/try session and do not start an installer.
+- Do not erase or repartition any disk.
+- Back up important files before any future installation work.
 
-A live image is designed to run without modifying the internal drive, but booting from external media still requires care. Back up important files before any future disk or installation work.
+## Applications
 
-## Design goals
-
-- Debian Stable base and a trimmed XFCE desktop for modest hardware
-- Low-overhead compositor settings, dock icon-zoom animation and zram swap tuning
-- Target idle desktop RAM below 1 GB, subject to real-hardware testing
-- Dark, uncluttered desktop with a dock
-- Google Chrome as the default browser, plus VLC media player for video and audio
-- File manager, terminal, settings and network controls
-- Java 21 development tools and BlueJ IDE for Java coursework
-- WordCraft word processor and DeckCraft presentation editor
-- SoundCraft audio workstation
-- Cloud ISO builds using GitHub Actions
-- No local Android Studio, Docker or Linux build environment required
-
-## Browser and media player
-
-The image downloads the official 64-bit Google Chrome Stable Debian package from Google's download server and sets Chrome as the default browser for newly created live-session users. Firefox is not installed by default. Chrome is proprietary software and its package increases the download and ISO size; its upstream package may add Google's update repository during installation. VLC is installed from Debian's repositories for local video and audio playback. Chrome can use substantial RAM on a 4 GB laptop, especially with many tabs, so keep tabs limited when prioritizing responsiveness.
-
-Official Chrome download: https://www.google.com/chrome/
-
-## Java and BlueJ
-
-The image build downloads the official BlueJ 6.0.1 Debian package from the BlueJ-Greenfoot GitHub release and includes it with OpenJDK 21 and OpenJFX. BlueJ is intended for 64-bit Intel/AMD systems. In the live session, look under **Applications → Development** or launch `bluej` from a terminal. A live session is temporary: files and installed changes may be lost on shutdown unless saved to another drive.
-
-Official BlueJ site: https://bluej.org/
-
-## WordCraft and DeckCraft
-
-FeviOS downloads the x86-64 Debian packages for [WordCraft](https://github.com/storytold/wordcraft/releases/tag/v0.8.0), an open-source word processor for documents, and [DeckCraft](https://github.com/storytold/deckcraft/releases/tag/v0.8.0), an open-source presentation editor. Launch them from the Applications menu or search for their names. They are actively developed software, so check release notes and keep backups of important work. The two installers add roughly 180 MB before ISO compression, so the final ISO will be larger.
-
-## SoundCraft
-
-FeviOS downloads the x86-64 Debian package for [SoundCraft](https://github.com/storytold/soundcraft/releases/tag/v0.8.0), an open-source digital audio workstation inspired by Pro Tools, and includes it in the live image. Search for **SoundCraft** in the Applications menu after booting.
-
-**Important:** SoundCraft v0.8.0 is still pre-alpha software, not a mature or production-ready DAW. Audio-device support, recording, plugins and project compatibility may have bugs; test it with non-critical projects and keep backups. A digital audio workstation can also use significant RAM and CPU, so performance on the target 4 GB laptop is not guaranteed. This is an x86-64 package for Intel/AMD PCs.
-
-## Performance targets
-
-- Removed the broad `xfce4-goodies` metapackage to avoid installing unnecessary plugins and utilities.
-- Kept XFCE's built-in compositor rather than adding another animation compositor, with window shadows disabled to reduce extra drawing.
-- Configured Plank dock icon zoom for a restrained animated effect.
-- Added zram swap tooling to help the 4 GB laptop cope with memory pressure. Compression uses CPU time, so performance must be checked on the actual machine.
-- The target is less than 1 GB RAM at an idle desktop after login, with no browser, BlueJ, WordCraft, DeckCraft or SoundCraft windows open. This cannot be promised from configuration alone: RAM readings vary by hardware, drivers, live-session cache and the measurement method.
+The first image prioritizes boot speed and low idle RAM. Large applications such as Chrome, VLC, Java, BlueJ, WordCraft and DeckCraft are intentionally not preinstalled in this minimal edition. They can be added in later optional editions or installed with APT when internet access and sufficient storage are available. Running browsers, Java IDEs and media editors will naturally use more RAM than the idle desktop.
 
 ## Roadmap
 
 1. Produce a repeatable bootable ISO.
-2. Test boot, Wi-Fi, sound, touchpad, display and suspend on target hardware.
-3. Refine the FeviOS theme, wallpaper, dock and app launcher.
-4. Add a clear first-run setup and useful defaults.
-5. Add installer support only after live-session testing is reliable.
+2. Test live boot, display, Wi-Fi, sound, touchpad and suspend on the HP laptop.
+3. Measure idle RAM using `free -h` and `/usr/bin/time` where appropriate.
+4. Tune startup services based on measured results.
+5. Add an optional applications bundle without increasing the minimal image by default.
+6. Consider an installer only after live USB testing is reliable.
 
-FeviOS uses Debian and other open-source components. Their respective licenses and trademarks remain with their owners.
+FeviOS Lite is an early development project and is not yet certified for production use. Debian and other upstream projects retain their respective trademarks and licenses.
