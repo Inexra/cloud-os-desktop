@@ -11,6 +11,7 @@ lxterminal
 mousepad
 lxappearance
 feh
+librsvg2-bin
 network-manager
 network-manager-gnome
 wpasupplicant
