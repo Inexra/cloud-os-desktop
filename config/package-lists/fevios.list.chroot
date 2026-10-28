@@ -1,13 +1,16 @@
-# Minimal 64-bit Debian desktop: keep background services and recommends low.
+# FeviOS Lite: minimal Debian base with a polished Openbox desktop.
 xserver-xorg
 lightdm
 lightdm-gtk-greeter
 openbox
+picom
 tint2
 rofi
 pcmanfm
 lxterminal
 mousepad
+lxappearance
+feh
 network-manager
 network-manager-gnome
 wpasupplicant
@@ -25,5 +28,7 @@ curl
 wget
 ca-certificates
 fonts-dejavu-core
+fonts-noto-core
+papirus-icon-theme
 adwaita-icon-theme
 zram-tools
